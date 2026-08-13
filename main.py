@@ -1,22 +1,6 @@
-from sqlite3 import Cursor
-from typing import Any
-
-
-from pydoc import cli
 from database import conectar, criar_tabela
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
-clientes =[
-    {   
-        "id": 1,
-        "nome": "João",
-        "idade": 30,
-        "email": "joao@example.com",
-        "telefone": "1234567890"
-}
-
-]
 
 
 class Cliente(BaseModel):
