@@ -1,12 +1,14 @@
 from database import conectar, criar_tabela
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class Cliente(BaseModel):
-    nome: str
-    idade: int
-    email: str
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    nome: str = Field(min_length=2, max_length=100)
+    idade: int = Field(gt=0, le=120)
+    email: EmailStr
     telefone: str
 
 
@@ -18,7 +20,7 @@ criar_tabela()
 def home():
     return {"mensagem": "Fa Manager V2"}
 
-@app.get("/clientes")
+@app.get("/clientes",)
 def listar_clientes():
     conexao = conectar()
     cursor = conexao.cursor()
@@ -58,7 +60,7 @@ def buscar_cliente (id: int):
 
 
 
-@app.post("/clientes")
+@app.post("/clientes", status_code=201)
 def cadastrar_cliente(cliente: Cliente):
     conexao = conectar()
     cursor = conexao.cursor()
