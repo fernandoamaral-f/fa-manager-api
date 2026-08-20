@@ -1,6 +1,7 @@
+import re
 from database import conectar, criar_tabela
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 class Cliente(BaseModel):
@@ -9,7 +10,18 @@ class Cliente(BaseModel):
     nome: str = Field(min_length=2, max_length=100)
     idade: int = Field(gt=0, le=120)
     email: EmailStr
-    telefone: str
+    telefone: str = Field(pattern=r"^\d{10,11}$")
+
+    @field_validator("telefone", mode="before")
+    @classmethod
+    def limpar_telefone(cls, valor):
+        if isinstance(valor, str):
+            if not re.fullmatch(r"[\d\s()+-]+", valor):
+                raise ValueError("Telefone contém caracteres inválidos")
+                
+            return re.sub(r"\D", "", valor)
+
+        return valor
 
 
 app = FastAPI()
@@ -130,17 +142,6 @@ def atualizar_cliente(id: int, novos_dados: Cliente):
         "telefone": novos_dados.telefone
     }
      
-      
-      
-    for cliente in clientes:
-        if cliente["id"] == id:
-            cliente["nome"] = novos_dados.nome
-            cliente["idade"] = novos_dados.idade
-            cliente["email"] = novos_dados.email
-            cliente["telefone"] = novos_dados.telefone
-            return cliente
-    raise HTTPException(status_code=404, detail="Cliente não encontrado")
-
 
 
 @app.delete("/clientes/{id}")
