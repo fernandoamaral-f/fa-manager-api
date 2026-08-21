@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException
 from database import conectar
 from schemas import Cliente
 
-router = APIRouter()
+router = APIRouter(prefix="/clientes",tags=["Clientes"])
 
-@router.get("/clientes")
+@router.get("")
 def listar_clientes():
     conexao = conectar()
     cursor = conexao.cursor()
@@ -22,7 +22,7 @@ def listar_clientes():
     return clientes_convertidos
 
 
-@router.get("/clientes/{id}")
+@router.get("/{id}")
 def buscar_cliente(id: int):
     conexao = conectar()
     cursor = conexao.cursor()
@@ -44,7 +44,7 @@ def buscar_cliente(id: int):
 
     return dict(cliente)
 
-@router.post("/clientes", status_code=201)
+@router.post("", status_code=201)
 def cadastrar_cliente(cliente: Cliente):
     conexao = conectar()
     cursor = conexao.cursor()
@@ -78,7 +78,7 @@ def cadastrar_cliente(cliente: Cliente):
 
     return novo_cliente
 
-@router.put("/clientes/{id}")
+@router.put("/{id}")
 def atualizar_cliente(id: int, novos_dados: Cliente):
     conexao = conectar()
     cursor = conexao.cursor()
@@ -114,7 +114,7 @@ def atualizar_cliente(id: int, novos_dados: Cliente):
     }
      
 
-@router.delete("/clientes/{id}")
+@router.delete("/{id}")
 def deletar_cliente(id: int):
     conexao = conectar()
     cursor = conexao.cursor()
