@@ -1,70 +1,37 @@
 from fastapi import APIRouter, HTTPException
 from database import conectar
 from schemas import Cliente
+from repositories.clientes import buscar_cliente_por_id, buscar_todos_clientes, inserir_cliente
 
 router = APIRouter(prefix="/clientes",tags=["Clientes"])
 
 @router.get("")
 def listar_clientes():
-    conexao = conectar()
-    cursor = conexao.cursor()
+    return buscar_todos_clientes()
 
-    cursor.execute("SELECT * FROM clientes")
-    clientes = cursor.fetchall()
-
-    clientes_convertidos = []
-
-    for cliente in clientes:
-        clientes_convertidos.append(dict(cliente))
-
-    conexao.close()
-
-    return clientes_convertidos
-
-
+    
 @router.get("/{id}")
 def buscar_cliente(id: int):
-    conexao = conectar()
-    cursor = conexao.cursor()
+    cliente = buscar_cliente_por_id(id)
 
-    cursor.execute(
-        "SELECT * FROM clientes WHERE id = ?",
-        (id,)
-    )
-
-    cliente = cursor.fetchone()
-
-    conexao.close()
-
+    
     if cliente is None:
         raise HTTPException(
             status_code=404,
             detail="Cliente não encontrado"
         )
 
-    return dict(cliente)
+    return cliente
 
 @router.post("", status_code=201)
 def cadastrar_cliente(cliente: Cliente):
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    cursor.execute(
-        """ INSERT INTO clientes (nome, idade, email, telefone)
-        VALUES (?, ?, ?, ?) """,
-
-        (   
+    novo_id = inserir_cliente(   
             cliente.nome,
             cliente.idade,
             cliente.email,
             cliente.telefone
-        )
+        )   
     
-    )
-
-    conexao.commit()
-
-    novo_id = cursor.lastrowid
 
     novo_cliente = {
         "id": novo_id,
@@ -73,8 +40,6 @@ def cadastrar_cliente(cliente: Cliente):
         "email": cliente.email,
         "telefone": cliente.telefone
     }
-
-    conexao.close()
 
     return novo_cliente
 
