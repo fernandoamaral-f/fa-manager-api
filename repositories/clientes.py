@@ -5,7 +5,7 @@ def buscar_todos_clientes():
     conexao = conectar()
     cursor = conexao.cursor()
 
-    cursor.execute("SELECT * FROM clientes")
+    cursor.execute("""SELECT * FROM clientes""")
     clientes = cursor.fetchall()
 
     clientes_convertidos = []
@@ -22,7 +22,7 @@ def buscar_cliente_por_id(id: int):
     conexao = conectar()
     cursor = conexao.cursor()
 
-    cursor.execute( "SELECT * FROM clientes WHERE id = ?",
+    cursor.execute( """SELECT * FROM clientes WHERE id = ?""",
     (id,)
     )
 
@@ -40,9 +40,7 @@ def inserir_cliente(nome, idade, email, telefone):
     conexao = conectar()
     cursor = conexao.cursor()
 
-    cursor.execute(
-        """
-        INSERT INTO clientes (nome, idade, email, telefone)
+    cursor.execute("""INSERT INTO clientes (nome, idade, email, telefone)
         VALUES (?, ?, ?, ?)
         """,
         (
@@ -60,3 +58,45 @@ def inserir_cliente(nome, idade, email, telefone):
     conexao.close()
 
     return novo_id
+
+
+def atualizar_cliente(id, nome, idade, email, telefone):
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("""UPDATE clientes SET nome = ?, idade = ?, email = ?, telefone = ?
+        WHERE id = ?
+        """,
+        (
+            nome,
+            idade,
+            email,
+            telefone,
+            id
+        )
+    )
+
+    conexao.commit()
+
+    linhas_alteradas = cursor.rowcount
+
+    conexao.close()
+
+    return linhas_alteradas
+
+def deletar_cliente(id):
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute(
+        "DELETE FROM clientes WHERE id = ?",
+        (id,)
+    )
+
+    conexao.commit()
+
+    linhas_afetadas = cursor.rowcount
+
+    conexao.close()
+
+    return linhas_afetadas
