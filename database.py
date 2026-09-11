@@ -1,11 +1,10 @@
-import os
 import sqlite3
 
-from dotenv import load_dotenv
+from config import settings
 
-load_dotenv()
 
-CAMINHO_BANCO = os.getenv("CAMINHO_BANCO", "fa_manager.db")
+
+CAMINHO_BANCO = settings.caminho_banco
 
 def conectar():
     conexao = sqlite3.connect(CAMINHO_BANCO)
